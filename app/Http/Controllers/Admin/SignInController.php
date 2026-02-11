@@ -25,15 +25,18 @@ class SignInController extends Controller
         $user = User::where('mobile', $request->mobile)->first();
        
         if (!$user) {
-            return response()->json(['message' => 'Invalid credentials1'], 401);
+            // return response()->json(['message' => 'Invalid credentials1'], 401);
+            return back()->with('error', 'Invalid credentials. Please try again.');
         }
 
         if ($user->status !== 'active') {
-            return response()->json(['message' => 'User inactive'], 403);
+            // return response()->json(['message' => 'User inactive'], 403);
+            return back()->with('error', 'User is inactive.');
         }
 
         if ($user->locked_until && now()->lt($user->locked_until)) {
-            return response()->json(['message' => 'Account temporarily locked'], 403);
+            // return response()->json(['message' => 'Account temporarily locked'], 403);
+            return back()->with('error', 'Account temporarily locked. Please try again later.');
         }
 
         if (!Hash::check($request->mpin, $user->mpin)) {
@@ -46,7 +49,8 @@ class SignInController extends Controller
                 ]);
             }
 
-            return response()->json(['message' => 'Invalid credentials2'], 401);
+            // return response()->json(['message' => 'Invalid credentials2'], 401);
+            return back()->with('error', 'Invalid MPIN. Please try again.');
         }
 
         $user->update(['failed_attempts' => 0]);
@@ -57,7 +61,8 @@ class SignInController extends Controller
         //     'token' => $token,
         //     'user' => $user
         // ]);
-        return response()->view('dashboard.index', compact('user'));
+        return redirect()->route('dashboard')
+    ->with('success', 'Login successful');
     }
 
     public function sendOtp(Request $request)
@@ -72,9 +77,10 @@ class SignInController extends Controller
         $rateLimitKey = 'otp-send:' . $mobile;
         if (RateLimiter::tooManyAttempts($rateLimitKey, 3)) {
             $seconds = RateLimiter::availableIn($rateLimitKey);
-            return response()->json([
-                'message' => "Too many OTP requests. Try again in {$seconds} seconds."
-            ], 429);
+                // return response()->json([
+                //     'message' => "Too many OTP requests. Try again in {$seconds} seconds."
+                // ], 429);
+                return back()->with('error', "Too many OTP requests. Try again in {$seconds} seconds.");
         }
 
         // Check for existing active OTP (not used AND not expired)
@@ -89,8 +95,6 @@ class SignInController extends Controller
         RateLimiter::hit($rateLimitKey, 60); //60 seconds decay
 
         if ($otp) {
-
-
             // Update existing
             $otp->update([
                 'otp' => $hashedOtp,
@@ -118,7 +122,8 @@ class SignInController extends Controller
         //     'message' => 'OTP sent successfully',
         //     'otp' => $otpCode // For testing purposes only, remove in production
         // ]);
-        return response()->view('auth.otp', ['mobile' => $mobile, 'otp' => $otpCode]);   
+       return redirect()->route('otp')
+    ->with(['success'=> 'OTP sent successfully', 'otp' => $otpCode, 'mobile' => $mobile]);   
     }
 
     public function verifyOtp(Request $request)
@@ -136,7 +141,8 @@ class SignInController extends Controller
             ->first();
 
         if (!$otp) {
-            return response()->json(['message' => 'Invalid or expired OTP'], 400);
+            // return response()->json(['message' => 'Invalid or expired OTP'], 400);
+            return back()->with('error', 'Invalid or expired OTP. Please request a new one.');
         }
 
         // 🔥 SECURITY: Hash comparison (update sendOtp to hash too)
@@ -147,7 +153,8 @@ class SignInController extends Controller
                 $otp->update(['used' => true]);  // Lock after max attempts
             }
 
-            return response()->json(['message' => 'Invalid OTP'], 400);
+            // return response()->json(['message' => 'Invalid OTP'], 400);
+            return back()->with('error', 'Invalid OTP. Please try again.');
         }
 
         // Success: Mark used + reset attempts
@@ -163,7 +170,7 @@ class SignInController extends Controller
         //     'message' => 'OTP verified successfully',
         //     'data' => ['mobile' => $request->mobile]  // Or token
         // ]);
-        return response()->view('auth.set-mpin', ['mobile' => $request->mobile]);
+        return redirect()->route('set.mpin')->with(['success' => 'OTP verified successfully', 'mobile' => $request->mobile]);
     }
 
     public function setMpin(Request $request)
@@ -176,7 +183,8 @@ class SignInController extends Controller
         $user = User::where('mobile', $request->mobile)->first();
 
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            // return response()->json(['message' => 'User not found'], 404);
+            return back()->with('error', 'User not found.');
         }
 
         $user->update([
@@ -186,7 +194,7 @@ class SignInController extends Controller
         // return response()->json([
         //     'message' => 'MPIN set successfully'
         // ]);
-        return response()->view('auth.login');
+        return redirect()->route('login')->with('success', 'MPIN set successfully. Please login.');
     }
     public function logout(Request $request)
     {
@@ -195,6 +203,6 @@ class SignInController extends Controller
         // return response()->json([
         //     'message' => 'Logged out successfully'
         // ]);
-        return response()->view('auth.login');
+        return redirect()->route('login')->with('success', 'Logged out successfully');
     }
 }

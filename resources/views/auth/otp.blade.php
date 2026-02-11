@@ -15,7 +15,9 @@
         {{ session('error') }}
     </div>
 @endif
-
+<script>
+    console.log('Session data:', @json(session()->all()));
+</script>
 
 <main class="auth-minimal-wrapper">
     <div class="auth-minimal-inner">
@@ -33,10 +35,11 @@
                     </p>
                      <script>
                         // For testing purposes, you can log the OTP to the console
-                        console.log('OTP for testing:', '{{ $otp }}');
+                        console.log('OTP for testing:', '{{ session('otp') }}');
                         </script>
                     <form method="POST" action="{{ route('otp.verify') }}" class="w-100 mt-4 pt-2">
                         @csrf
+                        <input type="hidden" name="mobile" value="{{ session('mobile') }}">
 
                         <!-- OTP INPUT -->
                         <div class="mb-4">
@@ -59,6 +62,8 @@
                         <span>Didn’t receive OTP?</span>
                         <form method="POST" action="{{ route('forgot.mpin.submit') }}">
                     @csrf
+                    <input type="hidden" name="mobile" value="{{ session('mobile') }}">
+
                         <button type="submit" class="btn btn-link p-0">
                                                             Resend OTP
                                                               </button>

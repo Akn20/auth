@@ -3,7 +3,17 @@
 @section('title', 'Login')
 
 @section('content')
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
 
+@if(session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
 <main class="auth-minimal-wrapper">
     <div class="auth-minimal-inner">
         <div class="minimal-card-wrapper">

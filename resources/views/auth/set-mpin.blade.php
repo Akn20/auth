@@ -41,6 +41,7 @@
 
                     <form method="POST" action="{{ route('mpin.store') }}" class="w-100 mt-4 pt-2">
                         @csrf
+                        <input type="hidden" name="mobile" value="{{ session('mobile') }}">
 
                         <!-- MPIN -->
                         <div class="mb-4">

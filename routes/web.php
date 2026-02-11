@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OtpController;
 
-
+Route::view('/', 'dashboard.index')->name('dashboard');
 // Login page
 Route::view('/login', 'auth.login')->name('login');
 
