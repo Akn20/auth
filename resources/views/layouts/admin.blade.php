@@ -20,7 +20,7 @@
         @include('partials.footer')
         <!-- [ Footer ] end -->
     </main>
-
+<!-- hello -->
     <!--! BEGIN: Vendors JS !-->
     @include('partials.scripts')
     <!--! END: Theme Customizer !-->
