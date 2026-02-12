@@ -13,8 +13,8 @@
                 <li class="nxl-item nxl-caption">
                     <label>Navigation</label>
                 </li>
-                
-                 {{-- ================= ORGANIZATION ================= --}}
+
+                {{-- ================= ORGANIZATION ================= --}}
                 <li class="nxl-item nxl-hasmenu">
                     <a href="javascript:void(0);" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-cast"></i></span>
@@ -58,11 +58,11 @@
 
                 {{-- ================= MODULE MANAGEMENT ================= --}}
                 <li class="nxl-item">
-    <a href="{{ route('modules.index') }}" class="nxl-link">
-        <span class="nxl-micon"><i class="feather-grid"></i></span>
-        <span class="nxl-mtext">Module Management</span>
-    </a>
-</li>
+                    <a href="{{ route('modules.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-grid"></i></span>
+                        <span class="nxl-mtext">Module Management</span>
+                    </a>
+                </li>
 
                 <!-- Religion -->
                 <li class="nxl-item">
@@ -88,6 +88,15 @@
                     </a>
                 </li>
 
+
+                <!-- Designation -->
+
+                <li class="nxl-item">
+                    <a href="{{ route('designation.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-send"></i></span>
+                        <span class="nxl-mtext">Designation</span>
+                    </a>
+                </li>
                 <!-- Blood Group -->
                 <li class="nxl-item">
                     <a href="{{ route('blood-groups.index') }}" class="nxl-link">
@@ -101,6 +110,7 @@
                     <a href="{{ route('departments.index') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-grid"></i></span>
                         <span class="nxl-mtext">Department</span>
+
                     </a>
                 </li>
 

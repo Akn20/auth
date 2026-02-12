@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Department;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
+use App\Helpers\ApiResponse;
+use Illuminate\Support\Str;
+
 
 
 class DepartmentController extends Controller
@@ -41,9 +44,9 @@ class DepartmentController extends Controller
         Department::create([
             'department_name' => $request->department_name,
             'department_code' => strtoupper($request->department_code),
-            'description'     => $request->description,
-            'status'          => (bool)$request->status,
-            'created_by'      => auth()->id() ?? null,
+            'description' => $request->description,
+            'status' => (bool) $request->status,
+            'created_by' => auth()->id() ?? null,
         ]);
 
         return redirect()->route('departments.index')->with('success', 'Department added.');
@@ -55,7 +58,7 @@ class DepartmentController extends Controller
         return view('masters.departments.edit', compact('department'));
     }
 
-    
+
     public function update(Request $request, string $id)
     {
         $department = Department::findOrFail($id);
@@ -75,15 +78,15 @@ class DepartmentController extends Controller
                     ->whereNull('deleted_at'),
             ],
             'description' => ['nullable'],
-            'status' => ['required', Rule::in(['1', '0'])], 
+            'status' => ['required', Rule::in(['1', '0'])],
         ]);
 
         $department->update([
             'department_name' => $request->department_name,
             'department_code' => strtoupper($request->department_code),
-            'description'     => $request->description,
-            'status'          => (bool)$request->status,
-            'updated_by'      => auth()->id() ?? null,
+            'description' => $request->description,
+            'status' => (bool) $request->status,
+            'updated_by' => auth()->id() ?? null,
         ]);
 
         return redirect()->route('departments.index')->with('success', 'Department updated.');
@@ -92,12 +95,12 @@ class DepartmentController extends Controller
     public function destroy(string $id)
     {
         $department = Department::findOrFail($id);
-        
+
         if (Schema::hasTable('staff') && \DB::table('staff')->where('department_id', $id)->exists()) {
             return back()->with('error', 'Cannot delete: department is assigned to staff.');
         }
 
-        $department->delete(); 
+        $department->delete();
         return back()->with('success', 'Department deleted.');
     }
 
@@ -127,5 +130,54 @@ class DepartmentController extends Controller
         return redirect()->route('departments.deleted')
             ->with('success', 'Department permanently deleted.');
     }
+
+    //API
+
+    public function apiIndex()
+    {
+        $data = Department::where('status', 1)->get();
+        return ApiResponse::success($data, 'Departments fetched');
+    }
+
+    public function apiStore(Request $request)
+    {
+        $request->validate([
+            'department_name' => 'required|max:100',
+            'status' => 'required'
+        ]);
+
+        $data = Department::create([
+            'id' => Str::uuid(),
+            'department_name' => $request->department_name,
+            'description' => $request->description,
+            'status' => $request->status,
+            'created_by' => 1
+        ]);
+
+        return ApiResponse::success($data, 'Department created');
+    }
+
+    public function apiUpdate(Request $request, $id)
+    {
+        $data = Department::findOrFail($id);
+
+        $data->update([
+            'department_name' => $request->department_name,
+            'description' => $request->description,
+            'status' => $request->status,
+            'updated_by' => 1
+        ]);
+
+        return ApiResponse::success($data, 'Department updated');
+    }
+
+    public function apiDelete($id)
+    {
+        $data = Department::findOrFail($id);
+        $data->delete();
+
+        return ApiResponse::success(null, 'Department deleted');
+    }
+
 
 }

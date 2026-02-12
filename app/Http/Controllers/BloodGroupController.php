@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BloodGroup;  
+use App\Models\BloodGroup;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;  
+use Illuminate\Validation\Rule;
+use App\Helpers\ApiResponse;
+use Illuminate\Support\Str;
+
 
 class BloodGroupController extends Controller
 {
@@ -21,7 +24,7 @@ class BloodGroupController extends Controller
         return view('masters.blood-groups.create');
     }
 
-    
+
     public function store(Request $request)
     {
         $request->validate([
@@ -41,14 +44,14 @@ class BloodGroupController extends Controller
 
         return redirect()->route('blood-groups.index')->with('success', 'Blood group added.');
     }
-    
+
     public function edit(string $id)
     {
         $bloodGroup = BloodGroup::findOrFail($id);
         return view('masters.blood-groups.edit', compact('bloodGroup'));
     }
 
-    
+
     public function update(Request $request, string $id)
     {
         $bloodGroup = BloodGroup::findOrFail($id);
@@ -71,7 +74,7 @@ class BloodGroupController extends Controller
 
     }
 
-    
+
     public function destroy(string $id)
     {
         $bloodGroup = BloodGroup::findOrFail($id);
@@ -104,4 +107,54 @@ class BloodGroupController extends Controller
 
         return redirect()->route('blood-groups.deleted')->with('success', 'Blood group permanently deleted.');
     }
+
+    //API
+
+    public function apiIndex()
+    {
+        $data = BloodGroup::where('status', 'Active')->get();
+        return ApiResponse::success($data, 'Blood groups fetched');
+    }
+
+    public function apiStore(Request $request)
+    {
+        $request->validate([
+            'blood_group_name' => 'required|max:10',
+            'status' => 'required'
+        ]);
+
+        $data = BloodGroup::create([
+            'id' => Str::uuid(),
+            'blood_group_name' => $request->blood_group_name,
+            'status' => $request->status,
+            'created_by' => 1
+        ]);
+
+        return ApiResponse::success($data, 'Blood group created');
+    }
+
+    public function apiUpdate(Request $request, $id)
+    {
+        $data = BloodGroup::findOrFail($id);
+
+        $data->update([
+            'blood_group_name' => $request->blood_group_name,
+            'status' => $request->status,
+            'updated_by' => 1
+        ]);
+
+        return ApiResponse::success($data, 'Blood group updated');
+    }
+
+    public function apiDelete($id)
+    {
+        $data = BloodGroup::findOrFail($id);
+        $data->delete();
+
+        return ApiResponse::success(null, 'Blood group deleted');
+    }
+
+
+
+
 }
