@@ -8,12 +8,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Cache;
-use Carbon\Carbon;
 
 class SignInController extends Controller
 {
 
+    //Login with mobile + MPIN
     public function login(Request $request)
     {
 
@@ -23,7 +22,7 @@ class SignInController extends Controller
         ]);
 
         $user = User::where('mobile', $request->mobile)->first();
-       
+
         if (!$user) {
             // return response()->json(['message' => 'Invalid credentials1'], 401);
             return back()->with('error', 'Invalid credentials. Please try again.');
@@ -62,9 +61,10 @@ class SignInController extends Controller
         //     'user' => $user
         // ]);
         return redirect()->route('dashboard')
-    ->with('success', 'Login successful');
+            ->with('success', 'Login successful');
     }
 
+    // Send OTP (from Forgot MPIN)
     public function sendOtp(Request $request)
     {
         $request->validate([
@@ -72,28 +72,71 @@ class SignInController extends Controller
         ]);
 
         $mobile = $request->mobile;
+        Otp::where('mobile', $mobile)
+        ->where(function ($query) {
+            $query->where('used', 1)
+                  ->orWhere('expires_at', '<', now());
+        })
+        ->forceDelete();
+        $key = 'otp-send:' . $mobile;
 
-        // Global rate limiting: max 5 OTPs per hour per mobile (prevents abuse)
-        $rateLimitKey = 'otp-send:' . $mobile;
-        if (RateLimiter::tooManyAttempts($rateLimitKey, 3)) {
-            $seconds = RateLimiter::availableIn($rateLimitKey);
-                // return response()->json([
-                //     'message' => "Too many OTP requests. Try again in {$seconds} seconds."
-                // ], 429);
-                return back()->with('error', "Too many OTP requests. Try again in {$seconds} seconds.");
+        if (RateLimiter::tooManyAttempts($key, 3)) {
+            $seconds = RateLimiter::availableIn($key);
+            return back()->with('error', "Try again in {$seconds} seconds.");
         }
 
-        // Check for existing active OTP (not used AND not expired)
+        RateLimiter::hit($key, 60);
+
+        $otpCode = rand(100000, 999999);
+        $hashedOtp = Hash::make($otpCode);
+
+            Otp::create([
+                'mobile' => $mobile,
+                'otp' => $hashedOtp,
+                'expires_at' => now()->addMinutes(5),
+                'attempts' => 0,
+                'resends' => 0,
+                'used' => 0,
+                'last_sent_at' => now()
+            ]);
+
+        session(['otp_mobile' => $mobile]);
+
+        return redirect()->route('otp')
+            ->with(['success' => 'OTP sent successfully', 'otp' => $otpCode]);
+    }
+
+    // Resend OTP (from OTP page)
+    public function resendOtp()
+    {
+
+        $mobile = session('otp_mobile');
+
+        if (!$mobile) {
+            return redirect()->route('login')
+                ->with('error', 'Session expired.');
+        }
+
+
+        $key = 'otp-resend:' . $mobile;
+
+        if (RateLimiter::tooManyAttempts($key, 3)) {
+            $seconds = RateLimiter::availableIn($key);
+            return back()->with(
+                'error',
+                "Resend limit reached. Try again in {$seconds} seconds."
+            );
+        }
+
+        RateLimiter::hit($key, 60);
         $otp = Otp::where('mobile', $mobile)
-            ->where('used', false)
+            ->where('used', 0)
             ->where('expires_at', '>', now())
             ->latest()
             ->first();
 
         $otpCode = rand(100000, 999999);
         $hashedOtp = Hash::make($otpCode);
-        RateLimiter::hit($rateLimitKey, 60); //60 seconds decay
-
         if ($otp) {
             // Update existing
             $otp->update([
@@ -102,85 +145,74 @@ class SignInController extends Controller
                 'resends' => $otp->resends + 1,
                 'last_sent_at' => now()
             ]);
-        } else {
-            // New OTP (invalidate any expired/used ones implicitly via query)
-            Otp::create([
-                'mobile' => $mobile,
-                'otp' => $hashedOtp,
-                'expires_at' => now()->addMinutes(5),
-                'attempts' => 0,
-                'resends' => 0,
-                'used' => false,
-                'last_sent_at' => now()
-            ]);
         }
 
-        // Increment global rate limiter
-
-
-        // return response()->json([
-        //     'message' => 'OTP sent successfully',
-        //     'otp' => $otpCode // For testing purposes only, remove in production
-        // ]);
-       return redirect()->route('otp')
-    ->with(['success'=> 'OTP sent successfully', 'otp' => $otpCode, 'mobile' => $mobile]);   
+        return back()->with(['success' => 'OTP resent successfully', 'otp' => $otpCode]);
     }
 
-    public function verifyOtp(Request $request)
-    {
-        $request->validate([
-            'mobile' => 'required|digits:10',
-            'otp' => 'required|digits:6'
-        ]);
+    // Verify OTP (from OTP page)
+public function verifyOtp(Request $request)
+{
+    $mobile = session('otp_mobile');
 
-        // 🔥 FIX: Include expires_at in query (get only valid OTPs)
-        $otp = Otp::where('mobile', $request->mobile)
-            ->where('used', false)
-            ->where('expires_at', '>', now())  // Only active
-            ->latest()
-            ->first();
-
-        if (!$otp) {
-            // return response()->json(['message' => 'Invalid or expired OTP'], 400);
-            return back()->with('error', 'Invalid or expired OTP. Please request a new one.');
-        }
-
-        // 🔥 SECURITY: Hash comparison (update sendOtp to hash too)
-        if (!Hash::check($request->otp, $otp->otp)) {
-            $otp->increment('attempts');
-
-            if ($otp->fresh()->attempts >= 3) {
-                $otp->update(['used' => true]);  // Lock after max attempts
-            }
-
-            // return response()->json(['message' => 'Invalid OTP'], 400);
-            return back()->with('error', 'Invalid OTP. Please try again.');
-        }
-
-        // Success: Mark used + reset attempts
-        $otp->update([
-            'used' => true,
-            'attempts' => 0
-        ]);
-
-        // Optional: Generate token or login user here
-        // Auth::loginUsingId($userId);
-
-        // return response()->json([
-        //     'message' => 'OTP verified successfully',
-        //     'data' => ['mobile' => $request->mobile]  // Or token
-        // ]);
-        return redirect()->route('set.mpin')->with(['success' => 'OTP verified successfully', 'mobile' => $request->mobile]);
+    if (!$mobile) {
+        return redirect()->route('login')
+            ->with('error', 'Session expired.');
     }
 
+    
+    $verifyKey = 'otp-verify:' . $mobile;
+
+    // 🔒 Check if already locked
+    if (RateLimiter::tooManyAttempts($verifyKey, 3)) {
+        $seconds = RateLimiter::availableIn($verifyKey);
+
+        return back()->with('error',
+            "Too many invalid attempts. Try again in {$seconds} seconds."
+        );
+    }
+
+    $request->validate([
+        'otp' => 'required|digits:6'
+    ]);
+
+    $otp = Otp::where('mobile', $mobile)
+        ->where('used', 0)
+        ->where('expires_at', '>', now())
+        ->latest()
+        ->first();
+
+    if (!$otp || !Hash::check($request->otp, $otp->otp)) {
+
+        // ❗ Count failed attempt
+        RateLimiter::hit($verifyKey, 60);
+
+        return back()->with('error',
+            'Invalid OTP. Please try again.');
+    }
+
+    $otp->update(['used' => 1]);
+
+    RateLimiter::clear($verifyKey);
+
+    return redirect()->route('set.mpin')
+        ->with('success', 'OTP verified successfully');
+}
+
+
+    // Set MPIN (from Set MPIN page)
     public function setMpin(Request $request)
     {
+        $mobile = session('otp_mobile');
+        if (!$mobile) {
+            return redirect()->route('login')->with('error', 'Session expired.');
+        }
+
         $request->validate([
-            'mobile' => 'required|digits:10',
             'mpin' => 'required|digits_between:4,6'
         ]);
 
-        $user = User::where('mobile', $request->mobile)->first();
+        $user = User::where('mobile', $mobile)->first();
 
         if (!$user) {
             // return response()->json(['message' => 'User not found'], 404);
@@ -194,8 +226,11 @@ class SignInController extends Controller
         // return response()->json([
         //     'message' => 'MPIN set successfully'
         // ]);
+        session()->forget('otp_mobile');
+
         return redirect()->route('login')->with('success', 'MPIN set successfully. Please login.');
     }
+    // Logout (from any page, requires auth)
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
