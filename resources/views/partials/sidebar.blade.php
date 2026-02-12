@@ -13,6 +13,56 @@
                 <li class="nxl-item nxl-caption">
                     <label>Navigation</label>
                 </li>
+                
+                 {{-- ================= ORGANIZATION ================= --}}
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="javascript:void(0);" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-cast"></i></span>
+                        <span class="nxl-mtext">Organization</span>
+                        <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                    </a>
+                    <ul class="nxl-submenu">
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="{{ route('organization.index') }}">
+                                All Organizations
+                            </a>
+                        </li>
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="{{ route('organization.create') }}">
+                                Add Organization
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                {{-- ================= INSTITUTION ================= --}}
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="javascript:void(0);" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-send"></i></span>
+                        <span class="nxl-mtext">Institution</span>
+                        <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                    </a>
+                    <ul class="nxl-submenu">
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="{{ route('institutions.index') }}">
+                                All Institutions
+                            </a>
+                        </li>
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="{{ route('institutions.create') }}">
+                                Add Institution
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                {{-- ================= MODULE MANAGEMENT ================= --}}
+                <li class="nxl-item">
+    <a href="{{ route('modules.index') }}" class="nxl-link">
+        <span class="nxl-micon"><i class="feather-grid"></i></span>
+        <span class="nxl-mtext">Module Management</span>
+    </a>
+</li>
 
                 <!-- Religion -->
                 <li class="nxl-item">

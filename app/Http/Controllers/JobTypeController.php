@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\JobType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\ApiResponse;
+use Illuminate\Support\Str;
 
 class JobTypeController extends Controller
 {
@@ -96,4 +98,51 @@ $jobType->update([
         return redirect()->route('job-type.trash')
             ->with('success', 'Job Type removed permanently');
     }
+
+    //API
+
+    public function apiIndex()
+    {
+        $data = JobType::where('status', 'Active')->get();
+        return ApiResponse::success($data, 'Job types fetched');
+    }
+
+    public function apiStore(Request $request)
+    {
+        $request->validate([
+            'job_type_name' => 'required|max:100',
+            'status' => 'required'
+        ]);
+
+        $data = JobType::create([
+            'id' => Str::uuid(),
+            'job_type_name' => $request->job_type_name,
+            'status' => $request->status,
+            'created_by' => 1
+        ]);
+
+        return ApiResponse::success($data, 'Job type created');
+    }
+
+    public function apiUpdate(Request $request, $id)
+    {
+        $data = JobType::findOrFail($id);
+
+        $data->update([
+            'job_type_name' => $request->job_type_name,
+            'status' => $request->status,
+            'updated_by' => 1
+        ]);
+
+        return ApiResponse::success($data, 'Job type updated');
+    }
+
+    public function apiDelete($id)
+    {
+        $data = JobType::findOrFail($id);
+        $data->delete();
+
+        return ApiResponse::success(null, 'Job type deleted');
+    }
+
 }

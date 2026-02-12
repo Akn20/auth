@@ -55,6 +55,7 @@ Route::get('/work-status/trash', [WorkStatusController::class, 'trash'])->name('
 Route::get('/work-status/restore/{id}', [WorkStatusController::class, 'restore'])->name('work-status.restore');
 Route::get('/work-status/force-delete/{id}', [WorkStatusController::class, 'forceDelete'])->name('work-status.forceDelete');
 
+<<<<<<< HEAD
 // ---------Blood Group------------
 Route::prefix('masters')->group(function () {
     Route::resource('blood-groups', BloodGroupController::class)->except(['show']);
@@ -68,3 +69,15 @@ Route::resource('departments', DepartmentController::class);
 Route::get('departments/deleted/history', [DepartmentController::class, 'deletedHistory'])->name('departments.deleted');
 Route::put('departments/{id}/restore', [DepartmentController::class, 'restore'])->name('departments.restore');
 Route::delete('departments/{id}/force-delete', [DepartmentController::class, 'forceDelete'])->name('departments.forceDelete');
+=======
+use App\Http\Controllers\OrganizationController;
+Route::resource('organization', OrganizationController::class);
+
+use App\Http\Controllers\InstitutionController;
+
+Route::resource('institutions', InstitutionController::class);
+
+use App\Http\Controllers\ModuleController;
+
+Route::resource('modules', ModuleController::class);
+>>>>>>> 145e49955ce2ba573bcf4c43ecb5c05bb310f7c2

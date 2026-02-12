@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Religion;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Helpers\ApiResponse;
+use Illuminate\Support\Str;
 
 class ReligionController extends Controller
 {
@@ -90,7 +92,51 @@ class ReligionController extends Controller
         return redirect()->route('religion.trash')->with('success', 'Religion removed permanently');
     }
 
+    //API
 
+    public function apiIndex()
+    {
+        $data = Religion::where('status', 'Active')->get();
+        return ApiResponse::success($data, 'Religion list fetched');
+    }
+
+    public function apiStore(Request $request)
+    {
+        $request->validate([
+            'religion_name' => 'required|max:100',
+            'status' => 'required'
+        ]);
+
+        $data = Religion::create([
+            'id' => Str::uuid(),
+            'religion_name' => $request->religion_name,
+            'status' => $request->status,
+            'created_by' => 1
+        ]);
+
+        return ApiResponse::success($data, 'Religion created');
+    }
+
+    public function apiUpdate(Request $request, $id)
+    {
+        $data = Religion::findOrFail($id);
+
+        $data->update([
+            'religion_name' => $request->religion_name,
+            'status' => $request->status,
+            'updated_by' => 1
+        ]);
+
+        return ApiResponse::success($data, 'Religion updated');
+    }
+
+    public function apiDelete($id)
+    {
+        $data = Religion::findOrFail($id);
+        $data->delete();
+
+        return ApiResponse::success(null, 'Religion deleted');
+    }
 
 
 }
