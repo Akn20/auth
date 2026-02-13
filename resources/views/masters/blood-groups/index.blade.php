@@ -15,10 +15,10 @@
         </div>
 
         <div class="page-header-right ms-auto d-flex gap-2">
-            <a href="{{ route('blood-groups.deleted') }}" class="btn btn-primary">
-                  View Deleted Records
+            <a href="{{ route('blood-groups.deleted') }}" class="btn btn-neutral">
+                  Deleted Records
             </a>
-            <a href="{{ route('blood-groups.create') }}" class="btn btn-primary">+ Add Blood Group</a>
+            <a href="{{ route('blood-groups.create') }}" class="btn btn-neutral">Add Blood Group</a>
         </div>
     </div>
 
@@ -44,9 +44,9 @@
                                             <td class="fw-semibold">{{ $bg->blood_group_name }}</td>
                                             <td>
                                                 @if($bg->status === 'Active')
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-soft-success text-success">Active</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-soft-danger text-danger">Inactive</span>
                                                 @endif
                                             </td>
                                             <td class="text-end">
@@ -68,12 +68,11 @@
                                                         @method('DELETE')
 
                                                         <button type="submit"
-                                                                class="avatar-text avatar-md action-icon action-delete border-0 bg-transparent"
+                                                                class="avatar-text avatar-md action-icon action-delete"
                                                                 title="Delete">
                                                             <i class="feather-trash-2"></i>
                                                         </button>
                                                     </form>
-
                                                 </div>
                                             </td>
                                         </tr>
@@ -87,7 +86,6 @@
                                 </tbody>
                             </table>
                         </div>
-
                         {{-- Pagination --}}
                         <div class="mt-3">
                             {{ $bloodGroups->links() }}

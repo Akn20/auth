@@ -32,6 +32,7 @@
                                         <th>S.No</th>
                                         <th>Department Name</th>
                                         <th>Department Code</th>
+                                        <th>Department Code</th>
                                         <th>Status</th>
                                         <th class="text-end" style="width:160px;">Action</th>
                                     </tr>
@@ -42,11 +43,12 @@
                                             <td>{{ $departments->firstItem() + $i }}</td>
                                             <td class="fw-semibold">{{ $d->department_name }}</td>
                                             <td>{{ $d->department_code }}</td>
+                                            <td>{{$d->description}}</td>
                                             <td>
                                                 @if($d->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-soft-success text-success">Active</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-soft-danger text-danger">Inactive</span>
                                                 @endif
                                             </td>
                                             <td class="text-end">
@@ -61,7 +63,7 @@
                                                         onsubmit="return confirm('Delete this department?');">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button class="avatar-text avatar-md action-icon action-delete border-0 bg-transparent" title="Delete">
+                                                        <button class="avatar-text avatar-md action-icon action-delete" title="Delete">
                                                             <i class="feather-trash-2"></i>
                                                         </button>
                                                     </form>
