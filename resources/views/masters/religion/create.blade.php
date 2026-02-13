@@ -28,21 +28,8 @@
                             <form action="{{ route('religion.store') }}" method="POST">
                                 @csrf
 
-                                <div class="mb-4">
-                                    <label class="form-label">
-                                        Religion Name <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" name="religion_name" class="form-control"
-                                        placeholder="Enter religion name">
-                                </div>
+                                @include('masters.religion.form')
 
-                                <div class="mb-4">
-                                    <label class="form-label">Status</label>
-                                    <select name="status" class="form-select">
-                                        <option value="Active">Active</option>
-                                        <option value="Inactive">Inactive</option>
-                                    </select>
-                                </div>
 
                                 <div class="d-flex gap-2">
                                     <button type="submit" class="btn btn-primary">
