@@ -4,14 +4,14 @@
 @section('page-title', 'Dashboard')
 @section('title', 'Dashboard')
 @push('styles')
-<style>
-    .avatar-text {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-    }
-</style>
+    <style>
+        .avatar-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+    </style>
 @endpush
 @section('content')
 

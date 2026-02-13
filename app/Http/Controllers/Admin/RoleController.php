@@ -11,7 +11,20 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $roles = Role::latest()->get();
+        // Active roles list (non-deleted)
+        $roles = Role::latest()->paginate(10);
+
+        return view('admin.roles.index', compact('roles'));
+    }
+
+    /**
+     * Show only soft-deleted roles.
+     */
+    public function deleted()
+    {
+        $roles = Role::onlyTrashed()
+            ->latest()
+            ->paginate(10);
 
         return view('admin.roles.index', compact('roles'));
     }
@@ -61,12 +74,24 @@ class RoleController extends Controller
             ->with('success', 'Role updated successfully');
     }
 
+    /**
+     * Restore a soft-deleted role.
+     */
+    public function restore($id)
+    {
+        Role::withTrashed()->where('id', $id)->restore();
+
+        return redirect()
+            ->route('admin.roles.deleted')
+            ->with('success', 'Role restored successfully.');
+    }
+
     public function destroy(Role $role)
     {
-        $role->delete();
+        $role->delete(); // soft delete
 
         return redirect()
             ->route('admin.roles.index')
-            ->with('success', 'Role deleted successfully');
+            ->with('success', 'Role deleted successfully.');
     }
 }

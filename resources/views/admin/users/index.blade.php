@@ -5,26 +5,41 @@
 
 @section('content')
     <div class="page-header mb-4">
-        <div class="page-header-title">
-            <h5 class="m-b-10">
-                <i class="feather-users me-2"></i>Users
-            </h5>
-            <ul class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="{{ route('admin.dashboard') }}">Dashboard</a>
-                </li>
-                <li class="breadcrumb-item">Users</li>
-            </ul>
-        </div>
+        <div class="d-flex align-items-center w-100">
+            {{-- LEFT: title + breadcrumb --}}
+            <div class="page-header-title">
+                <h5 class="m-b-10 mb-1">
+                    <i class="feather-users me-2"></i>Users
+                </h5>
+                <ul class="breadcrumb mb-0">
+                    <li class="breadcrumb-item">
+                        <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item">Users</li>
+                </ul>
+            </div>
 
-        <div class="ms-auto">
-            <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
-                <i class="feather-user-plus me-1"></i> Add User
-            </a>
+            {{-- RIGHT: Deleted/Active toggle + Add User, same size as roles --}}
+            <div class="ms-auto d-flex gap-2">
+                @if (request()->routeIs('admin.users.deleted'))
+                    <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                        <i class="feather-users me-1"></i> Active Users
+                    </a>
+                @else
+                    <a href="{{ route('admin.users.deleted') }}" class="btn btn-outline-secondary">
+                        <i class="feather-trash-2 me-1"></i> Deleted Users
+                    </a>
+                @endif
+
+                <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+                    <i class="feather-user-plus me-1"></i> Add User
+                </a>
+            </div>
         </div>
     </div>
 
-    @if(session('success'))
+
+    @if (session('success'))
         <div class="alert alert-success mb-3">
             {{ session('success') }}
         </div>
@@ -32,7 +47,7 @@
 
     <div class="card stretch stretch-full">
         <div class="card-body">
-            @if($users->count())
+            @if ($users->count())
                 <div class="table-responsive">
                     <table class="table align-middle">
                         <thead>
@@ -45,42 +60,48 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($users as $index => $user)
+                            @foreach ($users as $index => $user)
                                 <tr>
                                     <td>{{ $users->firstItem() + $index }}</td>
                                     <td>{{ $user->name }}</td>
                                     <td>{{ optional($user->role)->name ?? '-' }}</td>
                                     <td>
-                                        @if($user->status ?? true)
+                                        @if ($user->status ?? true)
                                             <span class="badge bg-success">Active</span>
                                         @else
                                             <span class="badge bg-secondary">Inactive</span>
                                         @endif
                                     </td>
                                     <td class="text-end">
-                                      <div class="d-flex justify-content-end gap-2">
-                                           
-                                             
-                                            {{-- secondary action: e.g. edit --}}
-                                            <a href="{{ route('admin.users.edit', $user->id) }}"
-                                                class="btn btn-outline-secondary btn-icon rounded-circle">
-                                                <i class="feather-edit-2"></i>  
-                                            </a>
+                                        <div class="d-flex justify-content-end gap-2">
+                                            @if (request()->routeIs('admin.users.deleted'))
+                                                {{-- Restore button shown on deleted list --}}
+                                                <form action="{{ route('admin.users.restore', $user->id) }}" method="POST"
+                                                    onsubmit="return confirm('Restore this user?')">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-outline-success btn-icon rounded-circle"
+                                                        title="Restore">
+                                                        <i class="feather-rotate-ccw"></i>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                {{-- Edit --}}
+                                                <a href="{{ route('admin.users.edit', $user->id) }}"
+                                                    class="btn btn-outline-secondary btn-icon rounded-circle" title="Edit">
+                                                    <i class="feather-edit-2"></i>
+                                                </a>
 
-    
-                                                     <li>
-                                                        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST"
-                                                            onsubmit="return confirm('Delete this user?')">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-outline-secondary btn-icon rounded-circle">
-                                
-                                                                <i class="feather-trash-2"></i>
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                                {{-- Soft Delete --}}
+                                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST"
+                                                    onsubmit="return confirm('Delete this user?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-outline-danger btn-icon rounded-circle"
+                                                        title="Delete">
+                                                        <i class="feather-trash-2"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

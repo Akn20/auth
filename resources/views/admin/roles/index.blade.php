@@ -6,7 +6,7 @@
 @section('content')
     <div class="page-header mb-4">
         <div class="d-flex align-items-center w-100">
-            {{-- LEFT: title + breadcrumb (e.g. Roles Dashboard > Roles) --}}
+            {{-- LEFT: title + breadcrumb --}}
             <div class="page-header-title">
                 <h5 class="m-b-10 mb-1">
                     <i class="feather-shield me-2"></i>Roles
@@ -19,8 +19,18 @@
                 </ul>
             </div>
 
-            {{-- RIGHT: Add Role, pushed to right-most --}}
-            <div class="ms-auto">
+            {{-- RIGHT: Deleted/Active toggle + Add Role --}}
+            <div class="ms-auto d-flex gap-2">
+                @if (request()->routeIs('admin.roles.deleted'))
+                    <a href="{{ route('admin.roles.index') }}" class="btn btn-outline-secondary">
+                        <i class="feather-shield me-1"></i> Active Roles
+                    </a>
+                @else
+                    <a href="{{ route('admin.roles.deleted') }}" class="btn btn-outline-secondary">
+                        <i class="feather-trash-2 me-1"></i> Deleted Roles
+                    </a>
+                @endif
+
                 <a href="{{ route('admin.roles.create') }}" class="btn btn-primary">
                     <i class="feather-plus me-1"></i> Add Role
                 </a>
@@ -28,7 +38,7 @@
         </div>
     </div>
 
-    @if(session('success'))
+    @if (session('success'))
         <div class="alert alert-success mb-3">
             {{ session('success') }}
         </div>
@@ -36,7 +46,7 @@
 
     <div class="card stretch stretch-full">
         <div class="card-body">
-            @if($roles->count())
+            @if ($roles->count())
                 <div class="table-responsive">
                     <table class="table align-middle">
                         <thead>
@@ -49,13 +59,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($roles as $index => $role)
+                            @foreach ($roles as $index => $role)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $role->name }}</td>
                                     <td>{{ $role->description ?? '-' }}</td>
                                     <td>
-                                        @if($role->status)
+                                        @if ($role->status)
                                             <span class="badge bg-success">Active</span>
                                         @else
                                             <span class="badge bg-secondary">Inactive</span>
@@ -63,24 +73,36 @@
                                     </td>
                                     <td class="text-end">
                                         <div class="d-flex justify-content-end gap-2">
-                                            {{-- Edit --}}
-                                            <a href="{{ route('admin.roles.edit', $role->id) }}"
-                                                class="btn btn-outline-primary btn-icon rounded-circle">
-                                                <i class="feather-edit-2"></i>
-                                            </a>
+                                            @if (request()->routeIs('admin.roles.deleted'))
+                                                {{-- Restore --}}
+                                                <form action="{{ route('admin.roles.restore', $role->id) }}" method="POST"
+                                                    onsubmit="return confirm('Restore this role?')">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-outline-success btn-icon rounded-circle"
+                                                        title="Restore">
+                                                        <i class="feather-rotate-ccw"></i>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                {{-- Edit --}}
+                                                <a href="{{ route('admin.roles.edit', $role->id) }}"
+                                                    class="btn btn-outline-primary btn-icon rounded-circle" title="Edit">
+                                                    <i class="feather-edit-2"></i>
+                                                </a>
 
-                                            {{-- Delete --}}
-                                            <form action="{{ route('admin.roles.destroy', $role->id) }}" method="POST"
-                                                onsubmit="return confirm('Delete this role?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-outline-danger btn-icon rounded-circle">
-                                                    <i class="feather-trash-2"></i>
-                                                </button>
-                                            </form>
+                                                {{-- Soft Delete --}}
+                                                <form action="{{ route('admin.roles.destroy', $role->id) }}" method="POST"
+                                                    onsubmit="return confirm('Delete this role?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-outline-danger btn-icon rounded-circle"
+                                                        title="Delete">
+                                                        <i class="feather-trash-2"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
-
                                 </tr>
                             @endforeach
                         </tbody>

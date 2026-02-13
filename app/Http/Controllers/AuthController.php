@@ -8,7 +8,7 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        
+
         return redirect()->route('admin.dashboard')
             ->with('success', 'Login successful');
     }

@@ -67,4 +67,23 @@ class UserController extends Controller
             ->route('admin.users.index')
             ->with('success', 'User deleted successfully.');
     }
+
+    public function deleted()
+    {
+        $users = User::onlyTrashed()
+            ->with('role')
+            ->latest()
+            ->paginate(10);
+
+        return view('admin.users.index', compact('users'));
+    }
+
+    public function restore($id)
+    {
+        User::withTrashed()->where('id', $id)->restore();
+
+        return redirect()
+            ->route('admin.users.deleted')
+            ->with('success', 'User Restored Successfully.');
+    }
 }

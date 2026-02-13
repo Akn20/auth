@@ -15,17 +15,17 @@ class DatabaseSeeder extends Seeder
         $role = Role::firstOrCreate(
             ['name' => 'Admin'],
             [
-                'id'          => (string) Str::uuid(),
+                'id' => (string) Str::uuid(),
                 'description' => 'Default admin role',
-                'status'      => true,
+                'status' => true,
             ]
         );
 
         // Create a default user with that role
         User::factory()->create([
             'role_id' => $role->id,
-            'name'    => 'Test User',
-            'email'   => 'test@example.com',
+            'name' => 'Test User',
+            'email' => 'test@example.com',
         ]);
     }
 }
