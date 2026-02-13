@@ -3,64 +3,42 @@
 @section('content')
 <div class="nxl-content">
 
-    <div class="page-header d-flex align-items-center justify-content-between mb-5">
-        <h5 class="mb-0">Add Blood Group</h5>
-        <div class="page-header-right">
-            <a href="{{ route('blood-groups.index') }}" class="btn btn-light">Back</a>
+    <div class="page-header">
+        <div class="page-header-left d-flex align-items-center justify-content-between">
+            <div>
+                <div class="page-header-title">
+                    <h5 class="mb-0">Add Blood Group</h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">Masters</li>
+                    <li class="breadcrumb-item">Blood Groups</li>
+                </ul>
+            </div>
+
         </div>
-    </div>
+    </div> 
 
-    <div class="row justify-content-center mt-4">
-        <div class="col-12 col-md-10 col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form method="POST" action="{{ route('blood-groups.store') }}">
-                        @csrf
+    <div class="main-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card stretch stretch-full">
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('blood-groups.store') }}">
+                            @csrf
 
-                        <div class="mb-3">
-                            <label class="form-label">
-                                Blood Group Name <span class="text-danger">*</span>
-                            </label>
+                            @include('masters.blood-groups.form')
 
-                            <input type="text" name="blood_group_name"
-                                   value="{{ old('blood_group_name') }}"
-                                   class="form-control @error('blood_group_name') is-invalid @enderror"
-                                   placeholder="e.g. A+, O-, B+">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    Save
+                                </button>
+                                <a href="{{ route('blood-groups.index') }}" class="btn btn-light">
+                                    Cancel
+                                </a>
+                            </div>
 
-                            @error('blood_group_name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">
-                                Status <span class="text-danger">*</span>
-                            </label>
-
-                            <select name="status" class="form-select @error('status') is-invalid @enderror">
-                                <option value="Active" {{ old('status', 'Active') === 'Active' ? 'selected' : '' }}>
-                                    Active
-                                </option>
-                                <option value="Inactive" {{ old('status') === 'Inactive' ? 'selected' : '' }}>
-                                    Inactive
-                                </option>
-                            </select>
-
-                            @error('status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                Save
-                            </button>
-                            <a href="{{ route('blood-groups.index') }}"
-                               class="btn btn-outline-secondary">
-                                Cancel
-                            </a>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

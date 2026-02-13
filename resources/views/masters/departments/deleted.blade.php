@@ -41,9 +41,9 @@
                                     <td>{{ $d->department_code }}</td>
                                     <td>
                                         @if($d->status)
-                                            <span class="badge bg-success">Active</span>
+                                            <span class="badge bg-soft-success text-success">Active</span>
                                         @else
-                                            <span class="badge bg-secondary">Inactive</span>
+                                            <span class="badge bg-soft-danger text-danger">Inactive</span>
                                         @endif
                                     </td>
                                     <td>{{ optional($d->deleted_at)->format('d-m-Y H:i') }}</td>
