@@ -24,11 +24,21 @@ class JobTypeController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'job_type_code' => 'required|max:50|unique:job_type_master',
-            'job_type_name' => 'required|max:100',
-            'status' => 'required'
-        ]);
+        $request->validate(
+            [
+                'job_type_code' => 'required|max:50|unique:job_type_master,job_type_code',
+                'job_type_name' => 'required|max:100|unique:job_type_master,job_type_name',
+                'status' => 'required'
+            ],
+            [
+                'job_type_code.required' => 'Job type code is required.',
+                'job_type_code.unique' => 'Job type code already exists.',
+                'job_type_name.required' => 'Job type name is required.',
+                'job_type_name.unique' => 'Job type already exists.',
+                'status.required' => 'Please select status.'
+            ]
+        );
+
 
         JobType::create([
             'job_type_code' => $request->job_type_code,
@@ -53,11 +63,21 @@ class JobTypeController extends Controller
     {
         $jobType = JobType::findOrFail($id);
 
-        $request->validate([
-            'job_type_code' => "required|max:50|unique:job_type_master,job_type_code,$id",
-            'job_type_name' => 'required|max:100',
-            'status' => 'required'
-        ]);
+        $request->validate(
+            [
+                'job_type_code' => "required|max:50|unique:job_type_master,job_type_code,$id",
+                'job_type_name' => "required|max:100|unique:job_type_master,job_type_name,$id",
+                'status' => 'required'
+            ],
+            [
+                'job_type_code.required' => 'Job type code is required.',
+                'job_type_code.unique' => 'Job type code already exists.',
+                'job_type_name.required' => 'Job type name is required.',
+                'job_type_name.unique' => 'Job type already exists.',
+                'status.required' => 'Please select status.'
+            ]
+        );
+
 
         $jobType->update([
             'job_type_code' => $request->job_type_code,

@@ -82,10 +82,18 @@
                                                             <i class="feather-edit"></i>
                                                         </a>
 
-                                                        <a href="{{ route('designation.delete', $designation->id) }}"
-                                                            class="avatar-text avatar-md action-icon action-delete">
-                                                            <i class="feather-trash-2"></i>
-                                                        </a>
+                                                        <form action="{{ route('designation.delete', $designation->id) }}"
+                                                            method="POST" class="d-inline"
+                                                            onsubmit="return confirm('Are you sure you want to delete this designation?');">
+                                                            @csrf
+                                                            @method('DELETE')
+
+                                                            <button type="submit"
+                                                                class="avatar-text avatar-md action-icon action-delete"
+                                                                title="Delete">
+                                                                <i class="feather-trash-2"></i>
+                                                            </button>
+                                                        </form>
                                                     </div>
                                                 </td>
                                             </tr>

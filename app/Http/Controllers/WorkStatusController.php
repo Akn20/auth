@@ -24,11 +24,21 @@ class WorkStatusController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'work_status_code' => 'required|max:50|unique:work_status_master',
-            'work_status_name' => 'required|max:100',
-            'status' => 'required'
-        ]);
+        $request->validate(
+            [
+                'work_status_code' => 'required|max:50|unique:work_status_master,work_status_code',
+                'work_status_name' => 'required|max:100|unique:work_status_master,work_status_name',
+                'status' => 'required'
+            ],
+            [
+                'work_status_code.required' => 'Work status code is required.',
+                'work_status_code.unique' => 'Work status code already exists.',
+                'work_status_name.required' => 'Work status name is required.',
+                'work_status_name.unique' => 'Work status already exists.',
+                'status.required' => 'Please select status.'
+            ]
+        );
+
 
         WorkStatus::create([
             'work_status_code' => $request->work_status_code,
@@ -51,11 +61,21 @@ class WorkStatusController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'work_status_code' => "required|max:50|unique:work_status_master,work_status_code,$id",
-            'work_status_name' => 'required|max:100',
-            'status' => 'required'
-        ]);
+        $request->validate(
+            [
+                'work_status_code' => "required|max:50|unique:work_status_master,work_status_code,$id",
+                'work_status_name' => "required|max:100|unique:work_status_master,work_status_name,$id",
+                'status' => 'required'
+            ],
+            [
+                'work_status_code.required' => 'Work status code is required.',
+                'work_status_code.unique' => 'Work status code already exists.',
+                'work_status_name.required' => 'Work status name is required.',
+                'work_status_name.unique' => 'Work status already exists.',
+                'status.required' => 'Please select status.'
+            ]
+        );
+
 
         $workStatus = WorkStatus::findOrFail($id);
 

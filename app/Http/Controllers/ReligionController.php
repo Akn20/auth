@@ -24,10 +24,18 @@ class ReligionController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'religion_name' => 'required|max:100|unique:religion_master',
-            'status' => 'required'
-        ]);
+        $request->validate(
+            [
+                'religion_name' => 'required|max:100|unique:religion_master,religion_name',
+                'status' => 'required'
+            ],
+            [
+                'religion_name.required' => 'Religion name is required.',
+                'religion_name.unique' => 'This religion already exists.',
+                'status.required' => 'Please select status.'
+            ]
+        );
+
 
         Religion::create([
             'religion_name' => $request->religion_name,
@@ -47,10 +55,18 @@ class ReligionController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'religion_name' => "required|max:100|unique:religion_master,religion_name,$id",
-            'status' => 'required'
-        ]);
+        $request->validate(
+            [
+                'religion_name' => "required|max:100|unique:religion_master,religion_name,$id",
+                'status' => 'required'
+            ],
+            [
+                'religion_name.required' => 'Religion name is required.',
+                'religion_name.unique' => 'This religion already exists.',
+                'status.required' => 'Please select status.'
+            ]
+        );
+
 
         $religion = Religion::findOrFail($id);
 

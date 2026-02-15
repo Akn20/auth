@@ -3,6 +3,10 @@
     <input type="text" name="religion_name" class="form-control"
         value="{{ old('religion_name', $religion->religion_name ?? '') }}">
 </div>
+@error('religion_name')
+    <small class="text-danger">{{ $message }}</small>
+@enderror
+
 
 <div class="mb-4">
     <label class="form-label">Status</label>
