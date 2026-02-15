@@ -64,24 +64,41 @@ class DesignationController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'designation_code' => "required|max:20|unique:designation_master,designation_code,$id",
-            'designation_name' => 'required|max:100',
-            'status' => 'required'
-        ]);
+        $request->validate(
+            [
+                'designation_code' => 'required|max:20|unique:designation_master,designation_code',
+                'designation_name' => 'required|max:100|unique:designation_master,designation_name',
+                'status' => 'required'
+            ],
+            [
+                'designation_code.required' => 'Designation code is required.',
+                'designation_code.unique' => 'Designation code already exists.',
+                'designation_name.required' => 'Designation name is required.',
+                'designation_name.unique' => 'Designation already exists.',
+                'status.required' => 'Please select status.'
+            ]
+        );
+
 
         $designation = Designation::findOrFail($id);
 
         $status = $request->status == 'Active' ? 1 : 0;
 
-        $designation->update([
-            'designation_code' => $request->designation_code,
-            'designation_name' => $request->designation_name,
-            'department_id' => $request->department_id,
-            'description' => $request->description,
-            'status' => $status,
-            'updated_by' => 1
-        ]);
+        $request->validate(
+            [
+                'designation_code' => "required|max:20|unique:designation_master,designation_code,$id",
+                'designation_name' => "required|max:100|unique:designation_master,designation_name,$id",
+                'status' => 'required'
+            ],
+            [
+                'designation_code.required' => 'Designation code is required.',
+                'designation_code.unique' => 'Designation code already exists.',
+                'designation_name.required' => 'Designation name is required.',
+                'designation_name.unique' => 'Designation already exists.',
+                'status.required' => 'Please select status.'
+            ]
+        );
+
 
 
         return redirect()->route('designation.index')

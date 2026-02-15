@@ -2,6 +2,10 @@
     <label class="form-label">Designation Code</label>
     <input type="text" name="designation_code" class="form-control"
         value="{{ old('designation_code', $designation->designation_code ?? '') }}">
+    @error('designation_code')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
+
 
 </div>
 
@@ -9,6 +13,9 @@
     <label class="form-label">Designation Name</label>
     <input type="text" name="designation_name" class="form-control"
         value="{{ old('designation_name', $designation->designation_name ?? '') }}">
+    @error('designation_name')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
 
 </div>
 
@@ -30,6 +37,7 @@
     <label class="form-label">Description</label>
     <textarea name="description" class="form-control">{{ old('description', $designation->description ?? '') }}
     </textarea>
+
 </div>
 
 
