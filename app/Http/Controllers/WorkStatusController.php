@@ -132,19 +132,22 @@ class WorkStatusController extends Controller
     public function apiStore(Request $request)
     {
         $request->validate([
+            'work_status_code' => 'required|max:20|unique:work_status_master,work_status_code',
             'work_status_name' => 'required|max:100',
             'status' => 'required'
         ]);
 
         $data = WorkStatus::create([
             'id' => Str::uuid(),
+            'work_status_code' => $request->work_status_code,
             'work_status_name' => $request->work_status_name,
-            'status' => $request->status,
-            'created_by' => 1
+            'description' => $request->description,
+            'status' => $request->status
         ]);
 
-        return ApiResponse::success($data, 'Work status created');
+        return ApiResponse::success($data, 'Work status created successfully');
     }
+
 
     public function apiUpdate(Request $request, $id)
     {

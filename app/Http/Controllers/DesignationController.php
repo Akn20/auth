@@ -150,14 +150,15 @@ class DesignationController extends Controller
     public function apiStore(Request $request)
     {
         $request->validate([
-            'designation_code' => 'required|unique:designation_master',
+            'designation_code' => 'required|max:20|unique:designation_master,designation_code',
             'designation_name' => 'required|max:100',
+            'department_id' => 'required|exists:department_master,id',
             'status' => 'required'
         ]);
 
         $data = Designation::create([
             'id' => Str::uuid(),
-            'designation_code' => $request->designation_code,
+            'designation_code' => strtoupper($request->designation_code),
             'designation_name' => $request->designation_name,
             'department_id' => $request->department_id,
             'description' => $request->description,
@@ -165,15 +166,23 @@ class DesignationController extends Controller
             'created_by' => 1
         ]);
 
-        return ApiResponse::success($data, 'Designation created');
+        return ApiResponse::success($data, 'Designation created successfully');
     }
+
 
     public function apiUpdate(Request $request, $id)
     {
         $data = Designation::findOrFail($id);
 
+        $request->validate([
+            'designation_code' => 'required|max:20|unique:designation_master,designation_code,' . $id . ',id',
+            'designation_name' => 'required|max:100',
+            'department_id' => 'required|exists:department_master,id',
+            'status' => 'required'
+        ]);
+
         $data->update([
-            'designation_code' => $request->designation_code,
+            'designation_code' => strtoupper($request->designation_code),
             'designation_name' => $request->designation_name,
             'department_id' => $request->department_id,
             'description' => $request->description,
@@ -181,8 +190,9 @@ class DesignationController extends Controller
             'updated_by' => 1
         ]);
 
-        return ApiResponse::success($data, 'Designation updated');
+        return ApiResponse::success($data, 'Designation updated successfully');
     }
+
 
     public function apiDelete($id)
     {

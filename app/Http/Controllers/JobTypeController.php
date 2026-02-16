@@ -133,19 +133,23 @@ class JobTypeController extends Controller
     public function apiStore(Request $request)
     {
         $request->validate([
+            'job_type_code' => 'required|max:20|unique:job_type_master,job_type_code',
             'job_type_name' => 'required|max:100',
             'status' => 'required'
         ]);
 
         $data = JobType::create([
             'id' => Str::uuid(),
+            'job_type_code' => $request->job_type_code,
             'job_type_name' => $request->job_type_name,
+            'description' => $request->description,
             'status' => $request->status,
             'created_by' => 1
         ]);
 
-        return ApiResponse::success($data, 'Job type created');
+        return ApiResponse::success($data, 'Job type created successfully');
     }
+
 
     public function apiUpdate(Request $request, $id)
     {

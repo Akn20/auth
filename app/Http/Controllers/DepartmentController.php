@@ -143,19 +143,22 @@ class DepartmentController extends Controller
     {
         $request->validate([
             'department_name' => 'required|max:100',
+            'department_code' => 'required|max:20',
             'status' => 'required'
         ]);
 
         $data = Department::create([
             'id' => Str::uuid(),
             'department_name' => $request->department_name,
+            'department_code' => strtoupper($request->department_code),
             'description' => $request->description,
             'status' => $request->status,
             'created_by' => 1
         ]);
 
-        return ApiResponse::success($data, 'Department created');
+        return ApiResponse::success($data, 'Department created successfully');
     }
+
 
     public function apiUpdate(Request $request, $id)
     {
@@ -163,13 +166,15 @@ class DepartmentController extends Controller
 
         $data->update([
             'department_name' => $request->department_name,
+            'department_code' => strtoupper($request->department_code),
             'description' => $request->description,
             'status' => $request->status,
             'updated_by' => 1
         ]);
 
-        return ApiResponse::success($data, 'Department updated');
+        return ApiResponse::success($data, 'Department updated successfully');
     }
+
 
     public function apiDelete($id)
     {
