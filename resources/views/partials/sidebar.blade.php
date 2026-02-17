@@ -1,3 +1,18 @@
+<style>
+    /* Sidebar scroll with page */
+    .nxl-navigation .navbar-content {
+        height: 100vh;
+        /* full viewport height */
+        overflow-y: auto;
+        /* vertical scroll when content is taller */
+    }
+
+    .nxl-navigation .navbar-wrapper {
+        height: 100vh;
+        overflow-y: auto;
+    }
+</style>
+
 <nav class="nxl-navigation">
     <div class="navbar-wrapper">
         <div class="m-header">
@@ -22,7 +37,7 @@
                     </a>
                 </li>
 
-                {{-- Section: User & Role Management --}}
+                {{-- Section: Access Control --}}
                 <li class="nxl-item nxl-caption">
                     <label>Access Control</label>
                 </li>
@@ -46,7 +61,7 @@
                 <li class="nxl-item nxl-hasmenu">
                     <a href="javascript:void(0)" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-shield"></i></span>
-                        <span class="nxl-mtext">Roles & Permissions</span>
+                        <span class="nxl-mtext">Roles &amp; Permissions</span>
                         <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
                     </a>
                     <ul class="nxl-submenu">
@@ -59,24 +74,32 @@
                     </ul>
                 </li>
 
-                {{-- Section: App Management (example) --}}
+                {{-- Section: App Management --}}
                 <li class="nxl-item nxl-caption">
-                    <label>Management</label>
+                    <label>App Management</label>
                 </li>
 
-                <li class="nxl-item">
-                    <a href="#" class="nxl-link">
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="javascript:void(0)" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-settings"></i></span>
-                        <span class="nxl-mtext">System Settings</span>
+                        <span class="nxl-mtext">System</span>
+                        <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
                     </a>
+                    <ul class="nxl-submenu">
+                        <li class="nxl-item">
+                            <a href="{{ route('admin.financial-years.index') }}" class="nxl-link">
+                                Financial Years
+                            </a>
+                        </li>
+                        <li class="nxl-item">
+                            <a href="{{ route('admin.financial-years.mapping') }}" class="nxl-link">
+                                FY–Hospital Mapping
+                            </a>
+                        </li>
+                        {{-- existing System Settings / Activity Logs, etc. --}}
+                    </ul>
                 </li>
 
-                <li class="nxl-item">
-                    <a href="#" class="nxl-link">
-                        <span class="nxl-micon"><i class="feather-activity"></i></span>
-                        <span class="nxl-mtext">Activity Logs</span>
-                    </a>
-                </li>
 
                 {{-- Section: Account --}}
                 <li class="nxl-item nxl-caption">
