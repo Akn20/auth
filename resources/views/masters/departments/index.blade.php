@@ -32,7 +32,7 @@
                                         <th>S.No</th>
                                         <th>Department Name</th>
                                         <th>Department Code</th>
-                                        <th>Discription</th>
+                                        <th>Description</th>
                                         <th>Status</th>
                                         <th class="text-end" style="width:160px;">Action</th>
                                     </tr>
