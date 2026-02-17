@@ -74,13 +74,10 @@ Route::get('/designation/create', [DesignationController::class, 'create'])->nam
 Route::post('/designation/store', [DesignationController::class, 'store'])->name('designation.store');
 Route::get('/designation/edit/{id}', [DesignationController::class, 'edit'])->name('designation.edit');
 Route::post('/designation/update/{id}', [DesignationController::class, 'update'])->name('designation.update');
-<<<<<<< HEAD
 Route::delete('/designation/{id}', [DesignationController::class, 'destroy'])
     ->name('designation.delete');
 
-=======
 Route::delete('/designation/delete/{id}', [DesignationController::class, 'destroy'])->name('designation.delete');
->>>>>>> a667319a877c4fd5db7b7ea5f27abd1473d62d79
 
 Route::get('/designation/trash', [DesignationController::class, 'trash'])->name('designation.trash');
 Route::get('/designation/restore/{id}', [DesignationController::class, 'restore'])->name('designation.restore');
